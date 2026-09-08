@@ -176,6 +176,9 @@ final class SitemapGenerator
         return null;
     }
 
+    /**
+     * @return Builder<Model>|null
+     */
     protected static function queryFor(string $group): ?Builder
     {
         $config = (array) config("seo.sitemap.groups.{$group}");
@@ -205,6 +208,9 @@ final class SitemapGenerator
         return $query;
     }
 
+    /**
+     * @param  Builder<Model>  $query
+     */
     protected static function maxUpdatedAt(Builder $query): ?string
     {
         $model = $query->getModel();

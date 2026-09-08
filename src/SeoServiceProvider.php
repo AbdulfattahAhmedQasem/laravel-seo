@@ -28,7 +28,7 @@ class SeoServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         // مدير واحد لكل الطلب — يحمل بيانات SEO للصفحة الحالية
-        $this->app->scoped(SeoManager::class, fn () => new SeoManager());
+        $this->app->scoped(SeoManager::class, fn () => new SeoManager);
     }
 
     public function packageBooted(): void

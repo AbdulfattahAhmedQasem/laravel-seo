@@ -2,9 +2,9 @@
 
 namespace IProfile\Seo\Tests;
 
-use IProfile\Seo\SeoServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use IProfile\Seo\SeoServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra

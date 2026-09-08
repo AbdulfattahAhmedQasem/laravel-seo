@@ -7,6 +7,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use IProfile\Seo\Support\CanonicalUrl;
 
+/**
+ * @implements Arrayable<string,mixed>
+ */
 class SeoData implements Arrayable
 {
     /** @var array<string,string> locale => url */
@@ -31,9 +34,9 @@ class SeoData implements Arrayable
         public ?string $author = null,
     ) {}
 
-    public static function make(?string $title = null, ?string $description = null): static
+    public static function make(?string $title = null, ?string $description = null): self
     {
-        return new static(title: $title, description: $description);
+        return new self(title: $title, description: $description);
     }
 
     /* ---------------------------------------------------------------------

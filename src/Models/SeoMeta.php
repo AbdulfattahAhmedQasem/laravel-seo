@@ -37,6 +37,9 @@ class SeoMeta extends Model
         });
     }
 
+    /**
+     * @return MorphTo<Model,$this>
+     */
     public function seoable(): MorphTo
     {
         return $this->morphTo();
@@ -44,6 +47,7 @@ class SeoMeta extends Model
 
     /**
      * @param  Builder<static>  $query
+     * @return Builder<static>
      */
     public function scopeForLocale(Builder $query, ?string $locale = null): Builder
     {

@@ -1,8 +1,8 @@
 <?php
 
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Contracts\Http\Kernel;
 use IProfile\Seo\Http\Middleware\HandleSeoRedirects;
 use IProfile\Seo\Models\SeoRedirect;
 

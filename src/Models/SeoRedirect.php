@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Cache;
 /**
  * @property string $from
  * @property string $to
- * @property int    $status
- * @property int    $hits
+ * @property int $status
+ * @property int $hits
  */
 class SeoRedirect extends Model
 {

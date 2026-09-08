@@ -21,7 +21,7 @@ beforeEach(function () {
 
 function xml(string $body): DOMDocument
 {
-    $doc = new DOMDocument();
+    $doc = new DOMDocument;
     expect($doc->loadXML($body))->toBeTrue();
 
     return $doc;
@@ -136,7 +136,7 @@ it('لا يدرج مجموعة فارغة في الفهرس', function () {
 it('robots.txt يمنع الفهرسة خارج الإنتاج', function () {
     $this->asLocalEnvironment();
 
-    $this->get('/robots.txt')->assertOk()->assertSee("Disallow: /", false);
+    $this->get('/robots.txt')->assertOk()->assertSee('Disallow: /', false);
 });
 
 it('robots.txt يسمح ويشير إلى الفهرس في الإنتاج', function () {

@@ -40,7 +40,7 @@ final class CanonicalUrl
 
     protected static function currentQueryString(): string
     {
-        $query = request()?->getQueryString();
+        $query = request()->getQueryString();
 
         return $query ? '?'.$query : '';
     }
@@ -93,7 +93,7 @@ final class CanonicalUrl
      */
     public static function currentPage(): int
     {
-        $page = (int) (request()?->query(config('seo.canonical.page_parameter', 'page')) ?? 1);
+        $page = (int) (request()->query(config('seo.canonical.page_parameter', 'page')) ?? 1);
 
         return max($page, 1);
     }

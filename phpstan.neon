@@ -1,0 +1,14 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 6
+    paths:
+        - src
+        # Fixtures فقط لا كل tests: إغلاقات Pest لا يفهمها PHPStan
+        # ($this->get() داخلها)، وهذا قصور في التحليل لا عيب في الكود.
+        # وجود موديل يستخدم HasSeo هنا يجعل الـ trait قابلاً للتحليل.
+        - tests/Fixtures
+    tmpDir: build/phpstan
+    checkModelProperties: false
+    checkOctaneCompatibility: true

@@ -3,6 +3,7 @@
 namespace IProfile\Seo\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use IProfile\Seo\SeoManager;
 
 /**
  * @method static \IProfile\Seo\Data\SeoData data()
@@ -18,17 +19,17 @@ use Illuminate\Support\Facades\Facade;
  * @method static \IProfile\Seo\SeoManager image(?string $url)
  * @method static \IProfile\Seo\SeoManager type(string $value)
  * @method static \IProfile\Seo\SeoManager article(mixed $publishedAt = null, mixed $updatedAt = null, ?string $author = null)
- * @method static \IProfile\Seo\SeoManager breadcrumbs(array $items)
+ * @method static \IProfile\Seo\SeoManager breadcrumbs(array<int,array{name:string,url:string}> $items)
  * @method static \IProfile\Seo\SeoManager crumb(string $name, string $url)
- * @method static \IProfile\Seo\SeoManager alternates(array $map)
- * @method static \IProfile\Seo\SeoManager schema(array $schema)
+ * @method static \IProfile\Seo\SeoManager alternates(array<string,string> $map)
+ * @method static \IProfile\Seo\SeoManager schema(array<string,mixed> $schema)
  *
- * @see \IProfile\Seo\SeoManager
+ * @see SeoManager
  */
 class Seo extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return \IProfile\Seo\SeoManager::class;
+        return SeoManager::class;
     }
 }

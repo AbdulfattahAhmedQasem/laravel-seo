@@ -50,8 +50,8 @@ return [
     */
 
     'canonical' => [
-        'strip_query'    => true,
-        'allowed_query'  => ['page'],
+        'strip_query' => true,
+        'allowed_query' => ['page'],
         'page_parameter' => 'page',
         'trailing_slash' => false,
     ],
@@ -63,7 +63,7 @@ return [
     */
 
     'limits' => [
-        'title'       => ['min' => 30,  'max' => 60],
+        'title' => ['min' => 30,  'max' => 60],
         'description' => ['min' => 120, 'max' => 160],
     ],
 
@@ -75,19 +75,19 @@ return [
     */
 
     'organization' => [
-        'enabled'    => true,
-        'type'       => 'ProfessionalService',
-        'name'       => env('SEO_ORG_NAME'),
+        'enabled' => true,
+        'type' => 'ProfessionalService',
+        'name' => env('SEO_ORG_NAME'),
         'legal_name' => env('SEO_ORG_LEGAL_NAME'),
-        'logo'       => env('SEO_ORG_LOGO'),
-        'phone'      => env('SEO_ORG_PHONE'),
-        'email'      => env('SEO_ORG_EMAIL'),
+        'logo' => env('SEO_ORG_LOGO'),
+        'phone' => env('SEO_ORG_PHONE'),
+        'email' => env('SEO_ORG_EMAIL'),
         'founding_date' => null,
         'address' => [
-            'street'  => null,
-            'city'    => null,
-            'region'  => null,
-            'zip'     => null,
+            'street' => null,
+            'city' => null,
+            'region' => null,
+            'zip' => null,
             'country' => null,
         ],
         'geo' => [
@@ -109,8 +109,8 @@ return [
     */
 
     'sitemap' => [
-        'enabled'   => true,
-        'route'     => '/sitemap.xml',
+        'enabled' => true,
+        'route' => '/sitemap.xml',
         'cache_ttl' => 60 * 60 * 6, // 6 ساعات — للبيانات الوصفية فقط
 
         /*
@@ -146,7 +146,7 @@ return [
     */
 
     'robots' => [
-        'enabled'  => true,
+        'enabled' => true,
         'disallow' => ['/admin', '/login', '/register', '/*?s='],
     ],
 
@@ -157,8 +157,8 @@ return [
     */
 
     'redirects' => [
-        'enabled'    => true,
-        'cache_ttl'  => 60 * 60,
+        'enabled' => true,
+        'cache_ttl' => 60 * 60,
         'track_hits' => true,
 
         // إنشاء تحويل تلقائي عند تغيير الـ slug لأي موديل يستخدم HasSeo
@@ -186,8 +186,8 @@ return [
     'locales' => ['ar', 'en'],
 
     'hreflang' => [
-        'enabled'   => true,
+        'enabled' => true,
         'x_default' => 'ar',
-        'map'       => ['ar' => 'ar-SA', 'en' => 'en'],
+        'map' => ['ar' => 'ar-SA', 'en' => 'en'],
     ],
 ];

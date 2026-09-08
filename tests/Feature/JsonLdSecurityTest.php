@@ -1,6 +1,5 @@
 <?php
 
-use IProfile\Seo\Data\SeoData;
 use IProfile\Seo\Facades\Seo;
 use IProfile\Seo\Support\Json;
 

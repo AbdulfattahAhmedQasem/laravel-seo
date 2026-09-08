@@ -10,7 +10,7 @@ use IProfile\Seo\Data\SeoData;
  * يُعاد ضبطه بين الطلبات تلقائياً — بما في ذلك تحت Octane، حيث الحالة
  * المشتركة بين الطلبات هي مصدر الأخطاء الأول.
  *
- * @mixin \IProfile\Seo\Data\SeoData
+ * @mixin SeoData
  */
 class SeoManager
 {
@@ -18,7 +18,7 @@ class SeoManager
 
     public function __construct()
     {
-        $this->data = new SeoData();
+        $this->data = new SeoData;
     }
 
     public function data(): SeoData
@@ -35,7 +35,7 @@ class SeoManager
 
     public function reset(): static
     {
-        $this->data = new SeoData();
+        $this->data = new SeoData;
 
         return $this;
     }

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use IProfile\Seo\Facades\Seo;
 use IProfile\Seo\Models\SeoMeta;
@@ -46,8 +47,12 @@ it('لا يطلق أحداث الموديل أثناء بناء الرابط ا�
     $article = Article::create(['slug' => 'old', 'title' => 'أ']);
 
     $fired = 0;
-    Article::retrieved(function () use (&$fired) { $fired++; });
-    Article::saving(function () use (&$fired) { $fired++; });
+    Article::retrieved(function () use (&$fired) {
+        $fired++;
+    });
+    Article::saving(function () use (&$fired) {
+        $fired++;
+    });
 
     $article->update(['slug' => 'new']);
 
@@ -89,7 +94,7 @@ it('Seo::for يعيد المدير فتبقى السلسلة متسقة', functi
 });
 
 it('يرفض Seo::for لموديل بلا HasSeo برسالة واضحة', function () {
-    $model = new class extends Illuminate\Database\Eloquent\Model {};
+    $model = new class extends Model {};
 
     expect(fn () => Seo::for($model))->toThrow(InvalidArgumentException::class, 'HasSeo');
 });

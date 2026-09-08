@@ -4,7 +4,7 @@ namespace IProfile\Seo\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Support\Str;
+use IProfile\Seo\Contracts\Seoable;
 use IProfile\Seo\Data\SeoData;
 use IProfile\Seo\Models\SeoMeta;
 use IProfile\Seo\Models\SeoRedirect;
@@ -19,7 +19,7 @@ use IProfile\Seo\Models\SeoRedirect;
  *   - seoImageFrom(): ?string
  *   - seoSlugColumn(): string   (افتراضياً 'slug')
  *
- * @property-read \IProfile\Seo\Models\SeoMeta|null $seo
+ * @property-read SeoMeta|null $seo
  */
 trait HasSeo
 {
@@ -43,6 +43,9 @@ trait HasSeo
      | العلاقات
      |--------------------------------------------------------------------- */
 
+    /**
+     * @return MorphOne<SeoMeta,$this>
+     */
     public function seo(): MorphOne
     {
         return $this->morphOne(SeoMeta::class, 'seoable')
@@ -51,6 +54,9 @@ trait HasSeo
 
     /**
      * كل اللغات — للحذف وللوحة التحكم متعددة اللغات.
+     */
+    /**
+     * @return MorphOne<SeoMeta,$this>
      */
     public function seoAllLocales(): MorphOne
     {
@@ -62,6 +68,7 @@ trait HasSeo
      * منفصل — وهو N+1 الكلاسيكي في صفحة قائمة بها 50 عنصراً.
      *
      * @param  Builder<static>  $query
+     * @return Builder<static>
      */
     public function scopeWithSeo(Builder $query): Builder
     {
@@ -104,7 +111,7 @@ trait HasSeo
 
     protected function seoCanonical(): ?string
     {
-        return method_exists($this, 'seoUrl') ? $this->seoUrl() : null;
+        return $this instanceof Seoable ? $this->seoUrl() : null;
     }
 
     /* ---------------------------------------------------------------------
@@ -124,7 +131,7 @@ trait HasSeo
 
         $column = $this->seoSlugColumn();
 
-        if (! $this->isDirty($column) || ! method_exists($this, 'seoUrl')) {
+        if (! $this->isDirty($column) || ! $this instanceof Seoable) {
             return;
         }
 
