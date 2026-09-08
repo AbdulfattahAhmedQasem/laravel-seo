@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static \IProfile\Seo\Data\SeoData data()
- * @method static \IProfile\Seo\Data\SeoData for(\Illuminate\Database\Eloquent\Model $model)
+ * @method static \IProfile\Seo\SeoManager for(\Illuminate\Database\Eloquent\Model $model)
+ * @method static \IProfile\Seo\SeoManager reset()
+ * @method static \IProfile\Seo\SeoManager paginated(int $currentPage, int $lastPage)
  * @method static \IProfile\Seo\SeoManager set(\IProfile\Seo\Data\SeoData $data)
  * @method static \IProfile\Seo\SeoManager title(?string $value)
  * @method static \IProfile\Seo\SeoManager description(?string $value, int $limit = 160)

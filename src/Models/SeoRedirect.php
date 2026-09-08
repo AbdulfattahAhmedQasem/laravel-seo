@@ -183,6 +183,13 @@ class SeoRedirect extends Model
      | أدوات
      |--------------------------------------------------------------------- */
 
+    /**
+     * يختزل أي رابط إلى مسار مقارن.
+     *
+     * الرابط المطلق على نفس المضيف يُختزل إلى مساره: seoUrl() تعيد
+     * رابطاً مطلقاً دائماً، وتخزينه كاملاً كان يجعل الميدل وير — الذي
+     * يقارن بـ request()->path() — لا يطابقه أبداً.
+     */
     public static function normalize(string $path): string
     {
         if (self::isExternal($path)) {
@@ -194,8 +201,34 @@ class SeoRedirect extends Model
         return '/'.trim(is_string($parsed) ? $parsed : $path, '/');
     }
 
+    /**
+     * خارجي = مضيف مختلف عن مضيف التطبيق. مجرد بدئه بـ http لا يكفي.
+     */
     public static function isExternal(string $target): bool
     {
-        return str_starts_with($target, 'http://') || str_starts_with($target, 'https://');
+        $host = parse_url($target, PHP_URL_HOST);
+
+        if (! is_string($host) || $host === '') {
+            return false;
+        }
+
+        return ! in_array(mb_strtolower($host), self::localHosts(), true);
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    protected static function localHosts(): array
+    {
+        $hosts = [parse_url((string) config('app.url'), PHP_URL_HOST)];
+
+        if (app()->bound('request')) {
+            $hosts[] = request()->getHost();
+        }
+
+        return array_values(array_unique(array_map(
+            fn ($host) => mb_strtolower((string) $host),
+            array_filter($hosts, is_string(...))
+        )));
     }
 }
