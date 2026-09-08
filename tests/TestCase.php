@@ -26,7 +26,12 @@ class TestCase extends Orchestra
 
     protected function defineDatabaseMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        // مايجريشن الحزمة ملفات .php.stub (تُنشر باسم مؤرّخ عند التثبيت)،
+        // و loadMigrationsFrom لا يلتقط هذا الامتداد — تُشغَّل يدوياً.
+        foreach (glob(__DIR__.'/../database/migrations/*.php.stub') ?: [] as $stub) {
+            (include $stub)->up();
+        }
+
         $this->loadMigrationsFrom(__DIR__.'/Fixtures/migrations');
     }
 
