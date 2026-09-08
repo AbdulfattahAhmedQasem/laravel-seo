@@ -3,6 +3,8 @@
 namespace IProfile\Seo\Tests;
 
 use IProfile\Seo\SeoServiceProvider;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
@@ -32,7 +34,17 @@ class TestCase extends Orchestra
             (include $stub)->up();
         }
 
-        $this->loadMigrationsFrom(__DIR__.'/Fixtures/migrations');
+        // جداول التجهيز تُبنى صراحةً: أوضح وأسرع من اكتشاف المسارات.
+        Schema::create('articles', function (Blueprint $table) {
+            $table->id();
+            $table->string('slug')->unique();
+            $table->string('title')->nullable();
+            $table->text('excerpt')->nullable();
+            $table->text('body')->nullable();
+            $table->string('cover_image')->nullable();
+            $table->timestamp('published_at')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**
