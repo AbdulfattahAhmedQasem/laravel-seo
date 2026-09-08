@@ -104,8 +104,9 @@ php artisan seo:install
 
 ```php
 use IProfile\Seo\Concerns\HasSeo;
+use IProfile\Seo\Contracts\Seoable;
 
-class Service extends Model
+class Service extends Model implements Seoable
 {
     use HasSeo;
 
@@ -149,6 +150,17 @@ public function show(Service $service)
 
 الحزمة تشتق كل شيء من الموديل.
 
+> `Seo::for()` تعيد `SeoManager` (لا `SeoData`) فتبقى السلسلة متسقة مع بقية الواجهة.
+> للوصول إلى كائن البيانات نفسه: `Seo::data()`.
+
+### تجنّب N+1 في صفحات القوائم
+
+```php
+$services = Service::withSeo()->published()->get();
+```
+
+بدون `withSeo()` كل استدعاء لـ `seoData()` داخل الحلقة = استعلام منفصل.
+
 ### التحكم الكامل
 
 ```php
@@ -185,6 +197,31 @@ Seo::title('من نحن')
    ->crumb('الرئيسية', route('home'))
    ->crumb('من نحن', route('about'));
 ```
+
+### الصفحات المرقّمة
+
+```php
+Seo::title('المدونة')->paginated($posts->currentPage(), $posts->lastPage());
+```
+
+canonical ذاتي يحمل `?page=N`، و`noindex` تلقائي للصفحة خارج النطاق.
+جوجل ألغى `rel=prev/next` عام 2019؛ canonical يشير إلى الصفحة الأولى
+يُخفي المحتوى العميق عن الفهرسة تماماً.
+
+### الرابط المعياري
+
+يُنظَّف تلقائياً: يُوحَّد المضيف والمنفذ والشرطة النهائية، وتُحذف كل
+معاملات الاستعلام عدا المسموح بها في `config/seo.php`:
+
+```php
+'canonical' => [
+    'strip_query'   => true,
+    'allowed_query' => ['page'],   // قائمة سماح لا منع
+],
+```
+
+قائمة المنع تتقادم بصمت — `utm_*` و `fbclid` و `gclid` و ما يخترعه
+مُعلن غداً كلها تُنتج canonical مختلفاً لكل زيارة = محتوى مكرر.
 
 ### منع الفهرسة
 
@@ -251,26 +288,43 @@ Seo::for($post)->noindex(false);     // noindex, nofollow
 النتيجة:
 
 ```
-/sitemap.xml            → فهرس
+/sitemap.xml               → فهرس
 /sitemap-static.xml
 /sitemap-services.xml
-/sitemap-blog.xml
-/robots.txt             → يشير إلى الفهرس تلقائياً
+/sitemap-services-2.xml    → تلقائياً عند تجاوز 45 ألف رابط
+/robots.txt                → يشير إلى الفهرس تلقائياً
 ```
 
-مُخزّن في الكاش 6 ساعات. لمسحه فوراً:
+**الحجم:** الروابط تُبَث من قاعدة البيانات دفعةً دفعة (`lazyById`) وتُكتب
+إلى المخرج مباشرة، فالذاكرة ثابتة سواء كان الموقع بعشر صفحات أو بخمسين
+ألفاً. حد المواصفة (50,000 رابط لكل ملف) مُطبَّق مع تقسيم تلقائي.
+
+**الكاش:** يُخزَّن عدد الروابط وآخر تعديل فقط — لا محتوى الملف. الملف
+نفسه يحمل `Cache-Control: public` ليخدمه الـ CDN. المفتاح يراعي اللغة.
+
+`<lastmod>` يشتق من `MAX(updated_at)` الحقيقي لا من وقت الطلب.
+
+لمسح الكاش:
 
 ```bash
 php artisan seo:clear
 ```
 
-أو تلقائياً عبر Observer:
+---
+
+## التحويلات 301
 
 ```php
-Service::saved(fn () => Cache::forget('seo.sitemap.services'));
+SeoRedirect::create(['from' => '/old-page', 'to' => '/new-page']);
+SeoRedirect::create(['from' => '/removed', 'to' => '/', 'status' => 410]);
 ```
 
----
+- **البحث مفهرس:** استعلام `limit 1` بمفتاح كاش لكل مسار — لا يُحمَّل
+  الجدول في الذاكرة مهما بلغ عدد التحويلات.
+- **الحلقات ممنوعة عند الكتابة:** `أ→أ` و `أ→ب→أ` تُرفض باستثناء واضح.
+- **السلاسل تُسطَّح تلقائياً:** إنشاء `ب→ج` يحوّل `أ→ب` القائم إلى `أ→ج`.
+- **صفر أثر على الأصول:** الصور وملفات CSS المفقودة لا تستعلم قاعدة البيانات.
+- **الطرق غير الآمنة محميّة:** `POST` على رابط قديم لا يفقد جسمه في تحويل 301.
 
 ## تكامل Filament
 

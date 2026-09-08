@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('seo_meta', function (Blueprint $table) {
             $table->id();
             $table->morphs('seoable');
-            $table->string('locale', 5)->default('ar');
+            $table->string('locale', 5);
 
             $table->string('title')->nullable();
             $table->string('description', 320)->nullable();
@@ -28,7 +28,12 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->unique(['seoable_id', 'seoable_type', 'locale'], 'seo_meta_unique');
+            /*
+             | الترتيب مقصود: (seoable_type, seoable_id, locale) يخدم أيضاً
+             | البحث بالنوع وحده، بخلاف (id, type, locale) الذي لا يُستفاد
+             | من بادئته في أي استعلام واقعي.
+             */
+            $table->unique(['seoable_type', 'seoable_id', 'locale'], 'seo_meta_unique');
         });
     }
 

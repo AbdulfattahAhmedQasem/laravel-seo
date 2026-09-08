@@ -1,11 +1,21 @@
 {
     "name": "iprofile/laravel-seo",
     "description": "حزمة SEO كاملة للارفل: Meta ديناميكي، Schema.org، Sitemap، تحويلات 301، وتكامل Filament.",
-    "keywords": ["laravel", "seo", "schema-org", "sitemap", "meta-tags", "redirects"],
+    "keywords": [
+        "laravel",
+        "seo",
+        "schema-org",
+        "sitemap",
+        "meta-tags",
+        "redirects"
+    ],
     "type": "library",
     "license": "MIT",
     "authors": [
-        { "name": "I-Profile", "email": "dev@iprofile.sa" }
+        {
+            "name": "I-Profile",
+            "email": "dev@iprofile.sa"
+        }
     ],
     "require": {
         "php": "^8.3",
@@ -49,8 +59,19 @@
     },
     "scripts": {
         "test": "vendor/bin/pest",
-        "format": "vendor/bin/pint"
+        "test:coverage": "vendor/bin/pest --coverage --min=85",
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=1G",
+        "format": "vendor/bin/pint",
+        "check": [
+            "@format",
+            "@analyse",
+            "@test"
+        ]
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "support": {
+        "issues": "https://github.com/iprofile/laravel-seo/issues",
+        "source": "https://github.com/iprofile/laravel-seo"
+    }
 }

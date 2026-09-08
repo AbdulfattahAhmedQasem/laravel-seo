@@ -10,12 +10,20 @@ return new class extends Migration
     {
         Schema::create('seo_redirects', function (Blueprint $table) {
             $table->id();
+
+            // 255 محرفاً تكفي أي مسار واقعي وتبقى ضمن حد الفهرس الفريد
+            // في MySQL مع utf8mb4 (191×4). المسار الأطول من ذلك لا يُفهرس أصلاً.
             $table->string('from')->unique();
             $table->string('to');
+
             $table->unsignedSmallInteger('status')->default(301);
             $table->unsignedBigInteger('hits')->default(0);
             $table->timestamp('last_hit_at')->nullable();
             $table->timestamps();
+
+            // تسطيح السلاسل يبحث بـ where('to', ...) عند كل حفظ.
+            // بلا هذا الفهرس = مسح كامل للجدول مع كل تحويل جديد.
+            $table->index('to');
         });
     }
 
