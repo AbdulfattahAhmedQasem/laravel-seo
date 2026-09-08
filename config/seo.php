@@ -1,22 +1,36 @@
 <?php
 
+/*
+| ملاحظة معمارية: لا يُستدعى config() داخل هذا الملف إطلاقاً.
+| ملفات الإعدادات تُحمَّل قبل اكتمال الحاوية، والترتيب غير مضمون عند
+| config:cache — فقد تُخزَّن null إلى الأبد. القيم التي تعتمد على إعدادات
+| أخرى (مثل app.name) تُحلّ وقت التنفيذ في SeoData::siteName().
+*/
+
 return [
 
     /*
     |--------------------------------------------------------------------------
     | الهوية العامة
     |--------------------------------------------------------------------------
+    | اتركها null ليعود الاسم تلقائياً إلى app.name وقت التنفيذ.
     */
 
-    'title_suffix' => env('SEO_TITLE_SUFFIX', config('app.name')),
+    'title_suffix' => env('SEO_TITLE_SUFFIX'),
 
-    'title_separator' => ' | ',
+    'title_separator' => env('SEO_TITLE_SEPARATOR', ' | '),
 
-    'default_title' => env('SEO_DEFAULT_TITLE', config('app.name')),
+    'default_title' => env('SEO_DEFAULT_TITLE'),
 
     'default_description' => env('SEO_DEFAULT_DESCRIPTION'),
 
-    'default_image' => env('SEO_DEFAULT_IMAGE', '/img/og-default.jpg'),
+    'default_image' => env('SEO_DEFAULT_IMAGE'),
+
+    /*
+    | أبعاد صورة المشاركة. اضبطها فقط إن كنت تضمن أن كل صورك بهذا المقاس —
+    | الإعلان عن أبعاد خاطئة أسوأ من عدم الإعلان، إذ تقتصّ الشبكات الصورة.
+    */
+    'og_image_size' => null, // ['width' => 1200, 'height' => 630]
 
     'default_robots' => 'index, follow, max-image-preview:large, max-snippet:-1',
 
@@ -26,6 +40,21 @@ return [
     'indexable_environments' => ['production'],
 
     'twitter_handle' => env('SEO_TWITTER'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | الرابط المعياري (canonical)
+    |--------------------------------------------------------------------------
+    | قائمة سماح لا قائمة منع: معاملات التتبّع لا حصر لها، وأي قائمة منع
+    | تتقادم بصمت فتُنتج canonical مختلفاً لكل زيارة = محتوى مكرر.
+    */
+
+    'canonical' => [
+        'strip_query'    => true,
+        'allowed_query'  => ['page'],
+        'page_parameter' => 'page',
+        'trailing_slash' => false,
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -48,9 +77,9 @@ return [
     'organization' => [
         'enabled'    => true,
         'type'       => 'ProfessionalService',
-        'name'       => env('SEO_ORG_NAME', config('app.name')),
+        'name'       => env('SEO_ORG_NAME'),
         'legal_name' => env('SEO_ORG_LEGAL_NAME'),
-        'logo'       => '/img/logo.png',
+        'logo'       => env('SEO_ORG_LOGO'),
         'phone'      => env('SEO_ORG_PHONE'),
         'email'      => env('SEO_ORG_EMAIL'),
         'founding_date' => null,
@@ -59,7 +88,7 @@ return [
             'city'    => null,
             'region'  => null,
             'zip'     => null,
-            'country' => 'SA',
+            'country' => null,
         ],
         'geo' => [
             'lat' => null,
@@ -75,22 +104,36 @@ return [
     |--------------------------------------------------------------------------
     | خريطة الموقع
     |--------------------------------------------------------------------------
-    | كل مجموعة: مفتاح => إعدادات المصدر.
-    | 'model' يجب أن يستخدم trait المسار HasSeo وأن يعرّف toSitemapUrl().
+    | كل مجموعة: مفتاح => إعدادات المصدر. الموديل يجب أن ينفّذ عقد
+    | IProfile\Seo\Contracts\Seoable (أي يعرّف seoUrl()).
     */
 
     'sitemap' => [
-        'enabled'    => true,
-        'route'      => '/sitemap.xml',
-        'cache_ttl'  => 60 * 60 * 6, // 6 ساعات
-        'groups'     => [
+        'enabled'   => true,
+        'route'     => '/sitemap.xml',
+        'cache_ttl' => 60 * 60 * 6, // 6 ساعات — للبيانات الوصفية فقط
+
+        /*
+        | حد المواصفة الرسمية 50,000 رابط أو 50 ميجابايت لكل ملف.
+        | نبقى دون الحد بهامش أمان، وتُقسَّم المجموعة تلقائياً إلى صفحات.
+        */
+        'max_urls_per_file' => 45000,
+
+        /*
+        | عدد الصفوف المسحوبة من قاعدة البيانات في الدفعة الواحدة أثناء
+        | التوليد المتدفق. لا علاقة له بحجم الملف الناتج.
+        */
+        'chunk_size' => 1000,
+
+        'groups' => [
             // 'services' => [
-            //     'model' => \App\Models\Service::class,
-            //     'scope' => 'published',
-            //     'priority' => '0.9',
+            //     'model'      => \App\Models\Service::class,
+            //     'scope'      => 'published',
+            //     'priority'   => '0.9',
             //     'changefreq' => 'monthly',
             // ],
         ],
+
         'static_urls' => [
             // ['loc' => '/', 'priority' => '1.0', 'changefreq' => 'weekly'],
         ],
@@ -114,11 +157,24 @@ return [
     */
 
     'redirects' => [
-        'enabled'        => true,
-        'cache_ttl'      => 60 * 60,
-        'track_hits'     => true,
+        'enabled'    => true,
+        'cache_ttl'  => 60 * 60,
+        'track_hits' => true,
+
         // إنشاء تحويل تلقائي عند تغيير الـ slug لأي موديل يستخدم HasSeo
         'auto_on_slug_change' => true,
+
+        /*
+        | الامتدادات التي لا تُفحص إطلاقاً: صورة مفقودة لا تحتاج استعلام
+        | قاعدة بيانات، وموقع مقصوف بطلبات أصول ينهار على هذا الاستعلام.
+        */
+        'ignored_extensions' => [
+            'css', 'js', 'map', 'ico', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'avif',
+            'svg', 'woff', 'woff2', 'ttf', 'eot', 'mp4', 'webm', 'pdf', 'zip', 'txt',
+        ],
+
+        // مدة تخزين "لا يوجد تحويل" — يمنع استعلاماً لكل 404 متكرر.
+        'miss_cache_ttl' => 300,
     ],
 
     /*

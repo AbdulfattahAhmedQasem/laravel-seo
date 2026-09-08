@@ -5,9 +5,12 @@
         '@type'      => 'FAQPage',
         'mainEntity' => collect($items)->map(fn ($item) => [
             '@type'          => 'Question',
-            'name'           => $item['question'],
-            'acceptedAnswer' => ['@type' => 'Answer', 'text' => strip_tags($item['answer'])],
+            'name'           => $item['question'] ?? null,
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text'  => isset($item['answer']) ? strip_tags($item['answer']) : null,
+            ],
         ])->all(),
     ];
 @endphp
-<script type="application/ld+json">{!! json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+<x-seo::schema.json :data="$data" />

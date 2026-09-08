@@ -6,9 +6,9 @@
         'itemListElement' => collect($items)->values()->map(fn ($item, $i) => [
             '@type'    => 'ListItem',
             'position' => $i + 1,
-            'name'     => $item['name'],
-            'item'     => $item['url'],
+            'name'     => $item['name'] ?? null,
+            'item'     => $item['url'] ?? null,
         ])->all(),
     ];
 @endphp
-<script type="application/ld+json">{!! json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+<x-seo::schema.json :data="$data" />
