@@ -1,0 +1,56 @@
+{
+    "name": "iprofile/laravel-seo",
+    "description": "حزمة SEO كاملة للارفل: Meta ديناميكي، Schema.org، Sitemap، تحويلات 301، وتكامل Filament.",
+    "keywords": ["laravel", "seo", "schema-org", "sitemap", "meta-tags", "redirects"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        { "name": "I-Profile", "email": "dev@iprofile.sa" }
+    ],
+    "require": {
+        "php": "^8.3",
+        "illuminate/contracts": "^11.0|^12.0|^13.0",
+        "illuminate/database": "^11.0|^12.0|^13.0",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "spatie/laravel-package-tools": "^1.16"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "pestphp/pest": "^3.0|^4.0",
+        "laravel/pint": "^1.13",
+        "larastan/larastan": "^2.9|^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "IProfile\\Seo\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "IProfile\\Seo\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "IProfile\\Seo\\SeoServiceProvider"
+            ],
+            "aliases": {
+                "Seo": "IProfile\\Seo\\Facades\\Seo"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "format": "vendor/bin/pint"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
