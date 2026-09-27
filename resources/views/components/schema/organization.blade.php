@@ -28,6 +28,27 @@
             'longitude' => $org['geo']['lng'],
         ] : null,
         'sameAs' => ! empty($org['social']) ? array_values(array_filter($org['social'])) : null,
+
+        /*
+        | ساعات العمل ونطاق الخدمة — عنصران يقرأهما البحث المحلي.
+        |
+        | الحزمة تطبع ما يصلها ولا تخمّن: `opening_hours` مواصفةٌ واحدة أو
+        | قائمة مواصفات كما في schema.org، و`area_served` أسماء مدن. من
+        | يملأهما هو التطبيق (جسر بيانات المنشأة)، فتبقى الحزمة محايدة.
+        */
+        'openingHoursSpecification' => ! empty($org['opening_hours'])
+            ? array_map(
+                fn (array $spec): array => ['@type' => 'OpeningHoursSpecification'] + $spec,
+                array_is_list($org['opening_hours']) ? $org['opening_hours'] : [$org['opening_hours']],
+            )
+            : null,
+
+        'areaServed' => ! empty($org['area_served'])
+            ? array_map(
+                fn (string $name): array => ['@type' => 'City', 'name' => $name],
+                array_values(array_filter((array) $org['area_served'])),
+            )
+            : null,
     ];
 @endphp
 <x-seo::schema.json :data="$data" />

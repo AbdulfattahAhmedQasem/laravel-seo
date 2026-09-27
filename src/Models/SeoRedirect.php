@@ -196,9 +196,31 @@ class SeoRedirect extends Model
             return $path;
         }
 
-        $parsed = parse_url($path, PHP_URL_PATH);
+        /*
+         | ترميز ما ليس ASCII قبل parse_url ثم فكّه بعدها.
+         |
+         | **parse_url يُفسد المسارات غير اللاتينية بصمت.** مقيساً:
+         |   parse_url('/الديزل', PHP_URL_PATH)
+         |   2fd8a7d984d8afd98ad8b2d984  →  2fd8a7d95fd8afd95fd8b2d95f
+         | البايتات 0x84 و0x8A تُستبدَل بـ'_' (0x5F) — فيُخزَّن مسارٌ مكسور
+         | بلا خطأ، أو ترفضه قاعدة UTF-8 بـ"Incorrect string value".
+         |
+         | ولا يخصّ لغةً بعينها: أي مسار عربي أو صيني أو بحرفٍ مُشكَّل يمرّ
+         | بنفس الإفساد. الترميز يجعل ما يراه parse_url ASCII خالصاً،
+         | فيقصّ الاستعلام والشذرة ويستخرج المسار كما صُمِّم، ثم نستعيد
+         | النصّ الأصلي حرفاً بحرف.
+         */
+        $encoded = preg_replace_callback(
+            '/[^\x20-\x7E]/',
+            static fn (array $match): string => rawurlencode($match[0]),
+            $path,
+        ) ?? $path;
 
-        return '/'.trim(is_string($parsed) ? $parsed : $path, '/');
+        $parsed = parse_url($encoded, PHP_URL_PATH);
+
+        $decoded = rawurldecode(is_string($parsed) ? $parsed : $encoded);
+
+        return '/'.trim($decoded, '/');
     }
 
     /**

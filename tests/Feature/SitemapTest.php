@@ -119,11 +119,17 @@ it('يعيد 404 لمجموعة غير معرّفة', function () {
     $this->get('/sitemap-unknown.xml')->assertNotFound();
 });
 
-it('يضبط ترويسة كاش تسمح للـ CDN بخدمة الزواحف', function () {
-    $ttl = config('seo.sitemap.cache_ttl');
+it('يعلن للحافة مدّة http_ttl لا مدّة كاشنا', function () {
+    /*
+    | المدّتان مقصودتان مختلفتين: ما نحتفظ به نحن نُبطله متى شئنا، وما
+    | تحتفظ به شبكة التوصيل لا سبيل إلى إبطاله. فلو عادت الترويسة تحمل
+    | `cache_ttl` — كما كانت — بقيت صفحةٌ جديدة خارج الخريطة عند الزاحف
+    | ساعاتٍ بعد إضافتها. هذا الاختبار يمنع تلك العودة.
+    */
+    config(['seo.sitemap.cache_ttl' => 21600, 'seo.sitemap.http_ttl' => 300]);
 
-    $this->get('/sitemap.xml')->assertHeader('Cache-Control', "max-age={$ttl}, public");
-    $this->get('/robots.txt')->assertHeader('Cache-Control', "max-age={$ttl}, public");
+    $this->get('/sitemap.xml')->assertHeader('Cache-Control', 'max-age=300, public');
+    $this->get('/robots.txt')->assertHeader('Cache-Control', 'max-age=300, public');
 });
 
 it('لا يدرج مجموعة فارغة في الفهرس', function () {
